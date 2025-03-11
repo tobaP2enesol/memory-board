@@ -1,4 +1,4 @@
-// messages.js 内のサンプルデータ
+// メッセージデータを定義
 const messagesData = [
   // 部付メンバーのメッセージ
   { 
