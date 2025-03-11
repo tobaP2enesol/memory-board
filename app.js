@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-
+// メインのReactコンポーネント
 // 編集ページコンポーネント
 const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
-  const [editedMessages, setEditedMessages] = useState([...messages]);
+  const [editedMessages, setEditedMessages] = React.useState([...messages]);
 
   const handleInputChange = (id, field, value) => {
     setEditedMessages(editedMessages.map(msg => 
@@ -120,47 +119,24 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
 
 // メインコンポーネント
 const MemoryBoardWithEdit = () => {
-  // ページの状態管理
-  const [currentPage, setCurrentPage] = useState('main');
+  // 編集機能の有効期限
+  const EDIT_ENABLED_UNTIL = new Date('2025-05-11'); // 例：2025年5月11日まで編集可能
   
-  // サンプルメッセージ
-  const [messages, setMessages] = useState([
-    // 部付メンバーのメッセージ
-    { 
-      id: 1, 
-      name: '山田 太郎', 
-      role: 'エンジニア',
-      group: '部付',
-      message: 'いつも的確なアドバイスをありがとうございました。部長のおかげで新しい技術への挑戦が楽しめました！', 
-      avatar: '/api/placeholder/100/100',
-      memory: { title: 'プロジェクトAの打ち上げ', image: '/api/placeholder/150/100' } 
-    },
-    
-    // DX企画Gメンバーのメッセージ
-    { 
-      id: 2, 
-      name: '佐藤 花子', 
-      role: 'UXデザイナー',
-      group: 'DX企画G',
-      message: '部長の温かいリーダーシップがなければ、あのプロジェクトは成功しなかったと思います。本当に感謝しています。', 
-      avatar: '/api/placeholder/100/100',
-      memory: { title: 'デザイン合宿での一コマ', image: '/api/placeholder/150/100' }
-    },
-    { 
-      id: 3, 
-      name: '鈴木 一郎', 
-      role: 'プロダクトマネージャー',
-      group: 'DX企画G',
-      message: '部長との対話から学んだことは私の財産です。これからもその教えを活かしていきます！', 
-      avatar: '/api/placeholder/100/100',
-      memory: { title: '初めての顧客プレゼン', image: '/api/placeholder/150/100' }
-    }
-  ]);
+  // 編集機能の有効・無効を判定
+  const isEditingEnabled = () => {
+    return new Date() < EDIT_ENABLED_UNTIL;
+  };
+  
+  // ページの状態管理
+  const [currentPage, setCurrentPage] = React.useState('main');
+  
+  // messagesData から初期データを取得
+  const [messages, setMessages] = React.useState(messagesData);
 
   // アクティブなカードの状態管理
-  const [activeCard, setActiveCard] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [hoveredCard, setHoveredCard] = useState(null);
+  const [activeCard, setActiveCard] = React.useState(null);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [hoveredCard, setHoveredCard] = React.useState(null);
   
   // 各カードのホバー効果
   const handleCardHover = (id, isHovering) => {
@@ -184,6 +160,8 @@ const MemoryBoardWithEdit = () => {
   // メッセージを保存する処理
   const handleSaveMessages = (updatedMessages) => {
     setMessages(updatedMessages);
+    // ローカルストレージにも保存しておく
+    localStorage.setItem('memoryBoardMessages', JSON.stringify(updatedMessages));
   };
 
   // 編集ページに切り替える
@@ -195,6 +173,14 @@ const MemoryBoardWithEdit = () => {
   const goToMainPage = () => {
     setCurrentPage('main');
   };
+
+  // ローカルストレージからメッセージを読み込む
+  React.useEffect(() => {
+    const savedMessages = localStorage.getItem('memoryBoardMessages');
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
+  }, []);
 
   // 現在のページに応じたコンポーネントをレンダリング
   if (currentPage === 'edit') {
@@ -209,18 +195,20 @@ const MemoryBoardWithEdit = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       {/* ヘッダー */}
       <header className="relative text-center mb-12">
-        {/* 編集ボタン */}
-        <div className="absolute top-0 right-0">
-          <button
-            onClick={goToEditPage}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-            編集する
-          </button>
-        </div>
+        {/* 編集ボタン - 期限内のみ表示 */}
+        {isEditingEnabled() && (
+          <div className="absolute top-0 right-0">
+            <button
+              onClick={goToEditPage}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+              編集する
+            </button>
+          </div>
+        )}
         
         <h1 className="text-5xl font-bold mb-2 text-gray-900 tracking-tight">
           思い出のメモリーボード
@@ -361,7 +349,7 @@ const MemoryBoardWithEdit = () => {
               </div>
               <div className="mb-4 overflow-hidden rounded-lg">
                 <img 
-                  src="/api/placeholder/600/300" 
+                  src="https://via.placeholder.com/600x300" 
                   alt="部署立ち上げ" 
                   className="w-full h-32 object-cover rounded-lg"
                 />
@@ -419,11 +407,15 @@ const MemoryBoardWithEdit = () => {
         <audio 
           autoPlay 
           loop
-          src="https://example.com/background-music.mp3"
+          src="https://soundbible.com/mp3/Cheerful_Melody-Mike_Koenig-1562070454.mp3"
         />
       )}
     </div>
   );
 };
 
-export default MemoryBoardWithEdit;
+// レンダリング
+ReactDOM.render(
+  <MemoryBoardWithEdit />,
+  document.getElementById('root')
+);
