@@ -1,4 +1,3 @@
-// メインのReactコンポーネント
 // 編集ページコンポーネント
 const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
   const [editedMessages, setEditedMessages] = React.useState([...messages]);
@@ -53,6 +52,16 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
       message: '',
       avatar: 'https://via.placeholder.com/100'
     });
+  };
+
+  // メッセージ削除機能
+  const handleDeleteMessage = (id) => {
+    // 削除確認
+    if (window.confirm('このメッセージを削除しますか？')) {
+      // 指定されたIDのメッセージを除外した新しい配列を作成
+      const updatedMessages = editedMessages.filter(msg => msg.id !== id);
+      setEditedMessages(updatedMessages);
+    }
   };
 
   const handleSave = () => {
@@ -134,6 +143,17 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
         {/* 既存メッセージ編集フォーム */}
         {editedMessages.map((msg) => (
           <div key={msg.id} className="bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-blue-400">
+            {/* 削除ボタンをヘッダー部分に追加 */}
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="font-medium text-gray-900">メッセージ #{msg.id}</h3>
+              <button 
+                onClick={() => handleDeleteMessage(msg.id)}
+                className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+              >
+                削除
+              </button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">名前</label>
@@ -177,7 +197,7 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
 // メインコンポーネント
 const MemoryBoardWithEdit = () => {
   // 編集機能の有効期限
-  const EDIT_ENABLED_UNTIL = new Date('2025-03-27'); // 例：2025年3月27日まで編集可能
+  const EDIT_ENABLED_UNTIL = new Date('2025-05-11'); // 例：2025年5月11日まで編集可能
   
   // 編集機能の有効・無効を判定
   const isEditingEnabled = () => {
@@ -308,9 +328,10 @@ const MemoryBoardWithEdit = () => {
                   className="bg-white rounded-lg shadow-md overflow-hidden border-l-4 hover:shadow-xl transition-all duration-300"
                   style={{ 
                     borderLeftColor: groupName === '部付' ? '#3b82f6' : 
-                                    groupName === 'DX企画G' ? '#8b5cf6' : 
-                                    groupName === 'FAシステムG' ? '#10b981' : 
-                                    '#f97316',
+                                     groupName === 'DX企画G' ? '#8b5cf6' : 
+                                     groupName === 'FAシステムG' ? '#10b981' : 
+                                     groupName === '生産DXG' ? '#f97316' :
+                                      '#3b82f6', // デフォルト色
                     transform: hoveredCard === msg.id ? 'translateY(-8px)' : 'translateY(0)',
                     boxShadow: hoveredCard === msg.id ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : ''
                   }}
@@ -332,7 +353,6 @@ const MemoryBoardWithEdit = () => {
                         />
                       </div>
                       
-
                       {/* メッセージ内容 */}
                       <div className="flex-1">
                         <h3 className="font-bold text-lg text-gray-900">{msg.name}</h3>
@@ -340,18 +360,6 @@ const MemoryBoardWithEdit = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* 展開時に表示される思い出の写真 */}
-                  {activeCard === msg.id && (
-                    <div className="p-4 border-t border-gray-100 bg-gray-50">
-                      <p className="text-sm font-medium text-gray-700 mb-2">思い出の一コマ: {msg.memory.title}</p>
-                      <img 
-                        src={msg.memory.image} 
-                        alt={msg.memory.title} 
-                        className="w-full h-32 object-cover rounded-lg"
-                      />
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
