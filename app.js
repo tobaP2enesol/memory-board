@@ -332,11 +332,11 @@ const MemoryBoardWithEdit = () => {
                         />
                       </div>
                       
+
                       {/* メッセージ内容 */}
                       <div className="flex-1">
                         <h3 className="font-bold text-lg text-gray-900">{msg.name}</h3>
-                        <p className="text-sm text-gray-600 mb-2">{msg.role}</p>
-                        <p className="text-gray-800 leading-relaxed">{msg.message}</p>
+                        <p className="text-gray-800 leading-relaxed mt-2">{msg.message}</p>
                       </div>
                     </div>
                   </div>
