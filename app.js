@@ -120,7 +120,7 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
 // メインコンポーネント
 const MemoryBoardWithEdit = () => {
   // 編集機能の有効期限
-  const EDIT_ENABLED_UNTIL = new Date('2025-05-11'); // 例：2025年5月11日まで編集可能
+  const EDIT_ENABLED_UNTIL = new Date('2025-03-27'); // 例：2025年3月27日まで編集可能
   
   // 編集機能の有効・無効を判定
   const isEditingEnabled = () => {
