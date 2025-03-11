@@ -2,6 +2,13 @@
 // 編集ページコンポーネント
 const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
   const [editedMessages, setEditedMessages] = React.useState([...messages]);
+  // 新規メッセージ用の状態
+  const [newMessage, setNewMessage] = React.useState({
+    name: '',
+    group: '部付',
+    message: '',
+    avatar: 'https://via.placeholder.com/100'
+  });
 
   const handleInputChange = (id, field, value) => {
     setEditedMessages(editedMessages.map(msg => 
@@ -9,10 +16,43 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
     ));
   };
 
-  const handleMemoryChange = (id, field, value) => {
-    setEditedMessages(editedMessages.map(msg => 
-      msg.id === id ? { ...msg, memory: { ...msg.memory, [field]: value } } : msg
-    ));
+  // 新規メッセージの入力処理
+  const handleNewMessageChange = (field, value) => {
+    setNewMessage({
+      ...newMessage,
+      [field]: value
+    });
+  };
+
+  // 新規メッセージの追加処理
+  const handleAddMessage = () => {
+    // 入力チェック
+    if (!newMessage.name || !newMessage.message) {
+      alert('名前とメッセージを入力してください');
+      return;
+    }
+
+    // 新しいIDを生成（既存の最大ID + 1）
+    const maxId = editedMessages.length > 0 
+      ? Math.max(...editedMessages.map(msg => msg.id)) 
+      : 0;
+    
+    // 新しいメッセージを作成
+    const messageToAdd = {
+      ...newMessage,
+      id: maxId + 1
+    };
+
+    // メッセージリストに追加
+    setEditedMessages([...editedMessages, messageToAdd]);
+    
+    // 入力フォームをリセット
+    setNewMessage({
+      name: '',
+      group: '部付',
+      message: '',
+      avatar: 'https://via.placeholder.com/100'
+    });
   };
 
   const handleSave = () => {
@@ -41,6 +81,57 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
           </div>
         </div>
 
+        {/* 新規メッセージ追加フォーム */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-10 border-l-4 border-green-400">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">新しいメッセージを追加</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">名前 <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={newMessage.name}
+                onChange={(e) => handleNewMessageChange('name', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="名前を入力"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">グループ</label>
+              <select
+                value={newMessage.group}
+                onChange={(e) => handleNewMessageChange('group', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="部付">部付</option>
+                <option value="DX企画G">DX企画G</option>
+                <option value="FAシステムG">FAシステムG</option>
+                <option value="生産DXG">生産DXG</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">メッセージ <span className="text-red-500">*</span></label>
+            <textarea
+              value={newMessage.message}
+              onChange={(e) => handleNewMessageChange('message', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md h-24"
+              placeholder="メッセージを入力"
+            />
+          </div>
+          
+          <div className="text-right">
+            <button 
+              onClick={handleAddMessage}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              メッセージを追加
+            </button>
+          </div>
+        </div>
+
+        <h2 className="text-xl font-bold text-gray-900 mb-4">メッセージ一覧</h2>
+        {/* 既存メッセージ編集フォーム */}
         {editedMessages.map((msg) => (
           <div key={msg.id} className="bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-blue-400">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -54,28 +145,18 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">役職</label>
-                <input
-                  type="text"
-                  value={msg.role}
-                  onChange={(e) => handleInputChange(msg.id, 'role', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1">グループ</label>
+                <select
+                  value={msg.group}
+                  onChange={(e) => handleInputChange(msg.id, 'group', e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                />
+                >
+                  <option value="部付">部付</option>
+                  <option value="DX企画G">DX企画G</option>
+                  <option value="FAシステムG">FAシステムG</option>
+                  <option value="生産DXG">生産DXG</option>
+                </select>
               </div>
-            </div>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">グループ</label>
-              <select
-                value={msg.group}
-                onChange={(e) => handleInputChange(msg.id, 'group', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              >
-                <option value="部付">部付</option>
-                <option value="DX企画G">DX企画G</option>
-                <option value="FAシステムG">FAシステムG</option>
-                <option value="生産DXG">生産DXG</option>
-              </select>
             </div>
             
             <div className="mb-4">
@@ -85,30 +166,6 @@ const EditMessagesPage = ({ messages, onSaveMessages, onBack }) => {
                 onChange={(e) => handleInputChange(msg.id, 'message', e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-md h-24"
               />
-            </div>
-            
-            <div className="border-t border-gray-200 pt-4 mt-4">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">思い出</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">タイトル</label>
-                  <input
-                    type="text"
-                    value={msg.memory.title}
-                    onChange={(e) => handleMemoryChange(msg.id, 'title', e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">画像URL</label>
-                  <input
-                    type="text"
-                    value={msg.memory.image}
-                    onChange={(e) => handleMemoryChange(msg.id, 'image', e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-              </div>
             </div>
           </div>
         ))}
